@@ -85,6 +85,16 @@ CHECK_INTERVAL_SECONDS=60
 REQUEST_TIMEOUT=5
 ```
 
+## Monitored URLs (default)
+
+| URL | 
+|---|
+| https://google.com |
+| https://github.com |
+| http://example.com |
+
+Can be changed in `.env` file via `URLS` variable.
+
 ## Database Schema
 
 ```sql
