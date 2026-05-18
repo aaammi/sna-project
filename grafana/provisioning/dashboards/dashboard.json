@@ -1,0 +1,72 @@
+{
+  "title": "System Status and Uptime Monitor",
+  "tags": ["uptime", "monitoring"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Response Time (ms)",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 0 },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "refId": "A",
+          "format": "time_series",
+          "rawSql": "SELECT timestamp AS \"time\", url AS metric, response_time_ms FROM checks WHERE $__timeFilter(timestamp) ORDER BY timestamp ASC;"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Uptime % (Last 24h)",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 0 },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "refId": "B",
+          "format": "table",
+          "rawSql": "SELECT url, ROUND(100.0 * SUM(CASE WHEN is_success THEN 1 ELSE 0 END) / COUNT(*), 2) AS uptime FROM checks WHERE $__timeFilter(timestamp) GROUP BY url;"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "green", "value": 98 }
+            ]
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Latest Checks Logs",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 9 },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "refId": "C",
+          "format": "table",
+          "rawSql": "SELECT timestamp, url, status_code, response_time_ms, is_success, error_message FROM checks ORDER BY timestamp DESC LIMIT 20;"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38
+}
